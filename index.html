@@ -63,64 +63,34 @@ body {
   position:relative;
 }
 .icon-btn:hover { background:rgba(255,255,255,0.4); transform:scale(1.1); }
-.icon-btn svg { width:22px; height:22px; stroke:#fff; stroke-width:2; fill:none; }
 
-/* بطاقة الملف الشخصي احترافية */
+/* بطاقة الملف الشخصي */
 .profile-card {
   position:absolute;
-  top:55px;
+  top:50px;
   right:0;
-  width:190px;
+  width:220px;
   background:#fff;
   color:#111;
-  border-radius:10px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.15);
-  padding:8px;
+  border-radius:12px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+  padding:15px;
   display:none;
   flex-direction:column;
-  z-index:200;
-  animation:fadeIn 0.15s ease;
+  z-index:60;
 }
-
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(-6px);}
-  to   {opacity:1; transform:translateY(0);}
-}
-
-.profile-card .user {
-  font-weight:700;
-  padding:8px;
-  border-bottom:1px solid #eee;
-  font-size:.9rem;
+.profile-card h4 { margin:0 0 8px 0; font-size:1rem; }
+.profile-card a {
   display:flex;
   align-items:center;
   gap:8px;
-}
-
-.profile-card a {
-  padding:8px;
+  padding:6px 8px;
   text-decoration:none;
   color:#333;
-  border-radius:6px;
-  transition:0.2s;
-  font-size:.85rem;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  border-radius:8px;
+  transition: background 0.2s;
 }
-
-.profile-card a:hover { background:#f2f2f2; }
-
-.profile-card .logout {
-  color:#c0392b;
-  border-top:1px solid #eee;
-  padding:8px;
-  cursor:pointer;
-  border-radius:6px;
-  font-size:.85rem;
-}
-
-.profile-card .logout:hover { background:#ffeaea; }
+.profile-card a:hover { background:rgba(0,0,0,0.05); }
 
 /* القائمة الجانبية */
 .menu-panel {
@@ -190,9 +160,28 @@ body {
   user-select:none; pointer-events:none; animation-name:fall; animation-timing-function:linear; z-index:1;
 }
 @keyframes fall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(360deg);opacity:.8} }
+
+/* صفحة خطأ الهاتف */
+#mobileError {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background: linear-gradient(to top, #ffb6c1 0%, #dda0dd 40%, #9370db 70%, #6a5acd 100%);
+  color:#fff; font-size:1.5rem; text-align:center; padding:20px;
+  display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:9999;
+}
+#mobileError h1 { font-size:3rem; margin-bottom:15px; }
+#mobileError p { font-size:1.3rem; max-width:300px; }
+
+/* إخفاء الموقع عند الهاتف */
+body.mobile #contentWrapper > * { display:none; }
+
 </style>
 </head>
-<body>
+<body id="contentWrapper">
+
+<div id="mobileError">
+  <h1>⚠️ عذراً</h1>
+  <p>الموقع يعمل فقط على الحاسوب. يرجى فتحه من جهاز كمبيوتر.</p>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -203,21 +192,17 @@ body {
   <div class="icon-btn" id="profileBtn" title="الملف الشخصي">
     <div style="width:24px;height:24px;border-radius:50%;background:#ff6f61;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:12px;">NB</div>
     <div class="profile-card" id="profileCard">
-      <div class="user">👤 NB</div>
-      <a href="https://github.com" target="_blank">
-        GitHub
-        <span>↗</span>
-      </a>
-      <div class="logout" id="logoutBtn">تسجيل الخروج</div>
+      <h4>حساباتي</h4>
+      <a href="#">GitHub</a>
     </div>
   </div>
 </div>
 
-<div class="logo">content: <a href="">LMC</a></div>
-<div class="message">LMC : هو موقع لتبسيط عمل مكونات الحاسوب الاجهزة و البرامج بشكل مبسط</div>
+<div class="logo">LMC</div>
+<div class="message">اضغط على الزر للانتقال مباشرة إلى موقعنا</div>
 <a href="https://example.com" class="btn">
   <img src="https://via.placeholder.com/24" alt="Site Icon">
-  زيارة الموقع LMC
+  زيارة الموقع
 </a>
 
 <!-- القائمة الجانبية -->
@@ -266,6 +251,20 @@ body {
 <div class="footer">© 2025 موقعنا - جميع الحقوق محفوظة</div>
 
 <script>
+// كشف الهاتف وعرض صفحة الخطأ
+function checkMobile(){
+  const errorDiv = document.getElementById('mobileError');
+  if(window.innerWidth < 768){
+    errorDiv.style.display='flex';
+    document.body.classList.add('mobile');
+  } else {
+    errorDiv.style.display='none';
+    document.body.classList.remove('mobile');
+  }
+}
+window.addEventListener('load', checkMobile);
+window.addEventListener('resize', checkMobile);
+
 // النجوم
 function createStar(){
   const s=document.createElement('div');
@@ -319,30 +318,23 @@ profileBtn.addEventListener('click', (e)=>{
   profileCard.style.display = profileCard.style.display==='flex' ? 'none':'flex';
 });
 
-// زر تسجيل خروج وهمي
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  toast.textContent = "✅ تم تسجيل الخروج بنجاح";
-  toast.style.display='block';
-  setTimeout(()=>{ toast.style.display='none'; }, 4000);
-});
-
 // إغلاق أي نافذة عند الضغط خارجها
-document.body.addEventListener('click', ()=>{ 
+document.body.addEventListener('click', ()=>{
   menuPanel.classList.remove('show');
   profileCard.style.display='none';
 });
 
 // إشعار عند فتح الصفحة مع رقم عشوائي من 0 إلى 3
 const toast = document.getElementById('toast');
-const randomNum = Math.floor(Math.random()*4); // 0..3
+const randomNum = Math.floor(Math.random()*4);
 toast.textContent = `أنت و ${randomNum} في وضع مشاركة نفس الملف الشخصي NB`;
 toast.style.display='block';
 setTimeout(()=>{ toast.style.display='none'; }, 60000);
 
-// عند الضغط على أي عنصر فرعي: لا يغلق القائمة، يظهر تحذير مع اسم المادة
+// عند الضغط على أي عنصر فرعي: يظهر تحذير
 document.querySelectorAll('.submenu li').forEach(item=>{
   item.addEventListener('click', (e)=>{
-    e.stopPropagation(); 
+    e.stopPropagation();
     const title = item.getAttribute('data-title') || item.textContent.trim();
     toast.textContent = `❌ لا يمكنك الوصول إلى (${title}) أثناء وضع مشاركة الملف الشخصي مع آخرين`;
     toast.style.display='block';
